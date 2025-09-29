@@ -113,6 +113,7 @@ docker-compose up -d
 docker-compose ps
 
 # Enable hot-reloading of Traefik config - cannot be done in detached mode, must keep the terminal open
+# Windows only
 docker-compose watch
 
 # Access the application
