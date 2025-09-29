@@ -112,6 +112,9 @@ docker-compose up -d
 # Verify containers are running
 docker-compose ps
 
+# Enable hot-reloading of Traefik config - cannot be done in detached mode, must keep the terminal open
+docker-compose watch
+
 # Access the application
 # Frontend: http://localhost/
 # API: http://localhost/api/hello (requires auth: user/test)
