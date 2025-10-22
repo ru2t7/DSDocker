@@ -1,0 +1,11 @@
+172.19.0.1 - - [22/Oct/2025:08:48:44 +0000] "GET / HTTP/1.1" 200 2205 "-" "-" 1 "nginx-frontend@file" "http://nginx:80" 8ms
+172.19.0.1 - - [22/Oct/2025:08:48:44 +0000] "GET /favicon.ico HTTP/1.1" 404 555 "-" "-" 2 "nginx-frontend@file" "http://nginx:80" 0ms
+172.19.0.1 - - [22/Oct/2025:08:48:56 +0000] "GET /api/hello HTTP/1.1" 401 17 "-" "-" 3 "backend-api@file" "-" 0ms
+172.19.0.1 - user [22/Oct/2025:08:49:05 +0000] "GET /api/hello HTTP/1.1" 200 23 "-" "-" 4 "backend-api@file" "http://backend:5000" 7ms
+172.19.0.1 - - [22/Oct/2025:09:26:31 +0000] "GET /api_device HTTP/1.1" 404 153 "-" "-" 1 "nginx-frontend@file" "http://nginx:80" 15ms
+172.19.0.1 - - [22/Oct/2025:09:26:42 +0000] "GET /api_device/device HTTP/1.1" 404 153 "-" "-" 2 "nginx-frontend@file" "http://nginx:80" 1ms
+172.19.0.1 - - [22/Oct/2025:09:28:10 +0000] "GET /api_device/device HTTP/1.1" 401 17 "-" "-" 1 "backend-api-device@file" "-" 0ms
+172.19.0.1 - user [22/Oct/2025:09:28:55 +0000] "GET /api_device/device HTTP/1.1" 502 11 "-" "-" 2 "backend-api-device@file" "http://container_device:8081" 2ms
+172.19.0.1 - - [22/Oct/2025:09:30:24 +0000] "GET / HTTP/1.1" 200 2215 "-" "-" 1 "nginx-frontend@file" "http://nginx:80" 16ms
+172.19.0.1 - - [22/Oct/2025:09:30:26 +0000] "GET /api_device/device HTTP/1.1" 401 17 "-" "-" 2 "backend-api-device@file" "-" 0ms
+172.19.0.1 - user [22/Oct/2025:09:30:26 +0000] "GET /api_device/device HTTP/1.1" 502 11 "-" "-" 3 "backend-api-device@file" "http://container_device:8081" 1ms

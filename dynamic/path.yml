@@ -7,20 +7,20 @@ http:
         - web # Listen on the web (HTTP) entry point
       service: nginx # Forward to the nginx service
 
-    backend-api:
-      rule: "Host(`localhost`) && PathPrefix(`/api`)" # Match requests to localhost with /api prefix
+    backend-api-device:
+      rule: "Host(`localhost`) && PathPrefix(`/api_device`)" # Match requests to localhost with /api prefix
       entryPoints:
         - web # Listen on the web (HTTP) entry point
       middlewares:
         - auth-basic # Apply basic auth middleware
-        - strip-api-prefix # Remove /api prefix before forwarding
-      service: api-service
+        - strip-api-prefix-device # Remove /api prefix before forwarding
+      service: api-service-device
 
   middlewares:
-    strip-api-prefix: # Middleware to remove /api prefix
+    strip-api-prefix-device: # Middleware to remove /api prefix
       stripPrefix: 
         prefixes:
-          - "/api"
+          - "/api_device"
 
     auth-basic: # Middleware for basic authentication
       basicAuth:
@@ -33,7 +33,7 @@ http:
         servers:
           - url: "http://nginx:80" # Container name solved by Docker DNS
 
-    api-service:
+    api-service-device:
       loadBalancer:
         servers:
-          - url: "http://backend:5000" # Container name solved by Docker DNS
+          - url: "http://container_device:8080" # Container name solved by Docker DNS
