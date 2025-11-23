@@ -41,35 +41,41 @@ services:
   # BACKEND API SERVICES
   # ==========================================
 
-  container_device:
+  container-device:
     image: image_device
-    container_name: container_device
+    container_name: container-device
 #     Ports are commented out because Traefik handles external access internally
 #     ports:
 #       - "8080:8080"
+    build:
+      context: ../../DS/ds2025_spring_example/demo-device
+      dockerfile: Dockerfile
     environment:
       - DB_IP=db_device # Must match container_name of the database above
       - DB_PORT=5432    # Internal Postgres port
       - DB_DBNAME=example_db
       - DB_USER=postgres
       - DB_PASSWORD=root
-      - PERSON_SERVICE_URL=http://container_person:8081/people
+      - PERSON_SERVICE_URL=http://container-person:8081/people
     networks:
       proxy-network:
       
-  container_person:
+  container-person:
     image: image_person
-    container_name: container_person
+    container_name: container-person
 #     Ports are commented out because Traefik handles external access internally
 #    ports:
 #      - "8081:8081"
+    build:
+      context: ../../DS/ds2025_spring_example/demo-person
+      dockerfile: Dockerfile
     environment:
       - DB_IP=db_user
       - DB_PORT=5432
       - DB_DBNAME=example_db
       - DB_USER=postgres
       - DB_PASSWORD=root
-      - DEVICE_SERVICE_URL=docker compose up -d --build --force-recreate container_devicehttp://container_device:8080/device
+      - DEVICE_SERVICE_URL=http://container-device:8080/device
     networks:
       proxy-network:
 
@@ -85,8 +91,8 @@ services:
     networks:
       - proxy-network
     depends_on:
-      - container_person
-      - container_device
+      - container-person
+      - container-device
     environment:
 #       Tell React to talk to Traefik (localhost/api_...) not containers directly
       - REACT_APP_DEVICE_API_HOST=localhost/api_device

@@ -41,9 +41,9 @@ http:
     api-service-device:
       loadBalancer:
         servers:
-          - url: "http://container_device:8080"
+          - url: "http://container-device:8080"
 
     api-service-person:
       loadBalancer:
         servers:
-          - url: "http://container_person:8081"
+          - url: "http://container-person:8081"
