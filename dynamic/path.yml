@@ -1,39 +1,49 @@
 http:
-  # Define URL routing rules, middlewares, and services
   routers:
     nginx-frontend:
-      rule: "Host(`localhost`)" # Match requests to localhost without /api prefix
+      rule: "Host(`localhost`)"
       entryPoints:
-        - web # Listen on the web (HTTP) entry point
-      service: nginx # Forward to the nginx service
+        - web
+      service: frontend-service
 
     backend-api-device:
-      rule: "Host(`localhost`) && PathPrefix(`/api_device`)" # Match requests to localhost with /api prefix
+      rule: "Host(`localhost`) && PathPrefix(`/api_device`)"
       entryPoints:
-        - web # Listen on the web (HTTP) entry point
+        - web
       middlewares:
-        - auth-basic # Apply basic auth middleware
-        - strip-api-prefix-device # Remove /api prefix before forwarding
+        - strip-api-prefix-device
       service: api-service-device
 
+    backend-api-person:
+      rule: "Host(`localhost`) && PathPrefix(`/api_person`)"
+      entryPoints:
+        - web
+      middlewares:
+        - strip-api-prefix-person
+      service: api-service-person
+
   middlewares:
-    strip-api-prefix-device: # Middleware to remove /api prefix
-      stripPrefix: 
+    strip-api-prefix-device:
+      stripPrefix:
         prefixes:
           - "/api_device"
-
-    auth-basic: # Middleware for basic authentication
-      basicAuth:
-        users:
-          - "user:$apr1$H6uskkkW$IgXLP6ewTrSuBkTrqE8wj/" # password = "test"
+    strip-api-prefix-person:
+      stripPrefix:
+        prefixes:
+          - "/api_person"
 
   services:
-    nginx: 
+    frontend-service:
       loadBalancer:
         servers:
-          - url: "http://nginx:80" # Container name solved by Docker DNS
+          - url: "http://frontend:80"
 
     api-service-device:
       loadBalancer:
         servers:
-          - url: "http://container_device:8080" # Container name solved by Docker DNS
+          - url: "http://container_device:8080"
+
+    api-service-person:
+      loadBalancer:
+        servers:
+          - url: "http://container_person:8081"

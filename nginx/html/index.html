@@ -70,6 +70,20 @@ This HTML file demonstrates a simple frontend example for communicating with a b
                     // Re-enable the button after the request completes
                     btn.disabled = false;
                 });
+            fetch('/api_person/people')
+                .then((res) => res.text()) // Parse the response as text
+                .then((data) => {
+                    // Update the UI with the response data
+                    responseEl.innerText = data;
+                })
+                .catch((err) => {
+                    // Handle network errors or other issues
+                    responseEl.innerText = 'Error: ' + err;
+                })
+                .finally(() => {
+                    // Re-enable the button after the request completes
+                    btn.disabled = false;
+                });
         }
     </script>
 </body>

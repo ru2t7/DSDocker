@@ -1,69 +1,130 @@
 version: '3.9'
 
 services:
-  db:
+
+  # ==========================================
+  # DATABASE SERVICES
+  # ==========================================
+
+  db_device:
     image: postgres
-    container_name: db
+    container_name: db_device
     restart: always
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: root
       POSTGRES_DB: example_db
     ports:
-      - "5433:5432"
+      - "5434:5432" # Access from host via localhost:5434
     volumes:
-      - my-db:/var/lib/postgresql/data
+      - db-device-data:/var/lib/postgresql/data # Persist data even if container dies
     networks:
       proxy-network:
+
+  db_user:
+    image: postgres
+    container_name: db_user
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: example_db
+    ports:
+      - "5433:5432" # Access from host via localhost:5433
+    volumes:
+      - db-user-data:/var/lib/postgresql/data
+    networks:
+      proxy-network:
+
+
+  # ==========================================
+  # BACKEND API SERVICES
+  # ==========================================
 
   container_device:
     image: image_device
     container_name: container_device
-    ports:
-      - "8081:8080"
+#     Ports are commented out because Traefik handles external access internally
+#     ports:
+#       - "8080:8080"
     environment:
-      - DB_IP=db
+      - DB_IP=db_device # Must match container_name of the database above
+      - DB_PORT=5432    # Internal Postgres port
+      - DB_DBNAME=example_db
+      - DB_USER=postgres
+      - DB_PASSWORD=root
+      - PERSON_SERVICE_URL=http://container_person:8081/people
+    networks:
+      proxy-network:
+      
+  container_person:
+    image: image_person
+    container_name: container_person
+#     Ports are commented out because Traefik handles external access internally
+#    ports:
+#      - "8081:8081"
+    environment:
+      - DB_IP=db_user
       - DB_PORT=5432
       - DB_DBNAME=example_db
       - DB_USER=postgres
       - DB_PASSWORD=root
+      - DEVICE_SERVICE_URL=docker compose up -d --build --force-recreate container_devicehttp://container_device:8080/device
     networks:
       proxy-network:
 
-  nginx:
-    image: nginx:latest
-    container_name: nginx
-    volumes:
-      - ./nginx/html:/usr/share/nginx/html:ro
+  # ==========================================
+  # FRONTEND SERVICE
+  # ==========================================
+
+  frontend:
+    build:
+      context: ../../DS_react/react-demo/frontend
+      dockerfile: Dockerfile
+    container_name: frontend
     networks:
       - proxy-network
+    depends_on:
+      - container_person
+      - container_device
+    environment:
+#       Tell React to talk to Traefik (localhost/api_...) not containers directly
+      - REACT_APP_DEVICE_API_HOST=localhost/api_device
+      - REACT_APP_PERSON_API_HOST=localhost/api_person
 
+
+  # ==========================================
+  # REVERSE PROXY (TRAEFIK)
+  # ==========================================
 
   traefik:
     image: traefik:v3.0
     container_name: traefik
     restart: always
     ports:
-      - "80:80" # The HTTP port
-      # - "443:443" # The HTTPS port
-      - "8080:8080" # Dashboard port
+      - "80:80"     # The Main Entrypoint (HTTP) for all users
+      - "8082:8080" # Traefik Dashboard (View routes/errors)
     volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock:ro" # Traefik can listen to the Docker events
-      - "./traefik.yml:/etc/traefik/traefik.yml:ro" # Static configuration file
-      - "./dynamic:/etc/traefik/dynamic:ro" # Dynamic configuration files
-      - "./logs:/var/log/traefik" # Log files
-    develop: # Enable live reload of dynamic configuration files on Windows, if using Unix based system needs to be commented out
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"  # Traefik can listen to the Docker events
+      - "./traefik.yml:/etc/traefik/traefik.yml:ro"     # Static configuration file
+      - "./dynamic:/etc/traefik/dynamic:ro"             # Dynamic configuration files
+      - "./logs:/var/log/traefik"                       # Log files
+    develop:        # Enable live reload of dynamic configuration files on Windows, if using Unix based system needs to be commented out
       watch:
-       - path: ./dynamic                   # watch the whole folder
+       - path: ./dynamic                                # Hot-reloads config when you change files in ./dynamic
          action: restart
     networks:
       - proxy-network
 
+  # ==========================================
+  # NETWORKS & VOLUMES
+  # ==========================================
 
 # Define a shared network for all services
 networks:
   proxy-network:
-    driver: bridge
+    driver: bridge  # Allows containers to talk to each other by name
 
 volumes:
-  my-db:
+  db-device-data:   # Persistent storage for device DB
+  db-user-data:     # Persistent storage for user DB
