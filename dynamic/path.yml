@@ -14,6 +14,21 @@ http:
         - strip-api-prefix-device
       service: api-service-device
 
+    backend-device-swagger:
+      # Matches /device/swagger-ui.html, /device/v3/api-docs, etc.
+      rule: "Host(`localhost`) && PathPrefix(`/device`)"
+      entryPoints:
+        - web
+      # No middleware here! We want to send the "/device" part to Spring Boot.
+      service: api-service-device
+
+    backend-person-swagger:
+      # Matches /people/swagger-ui.html, /people/v3/api-docs
+      rule: "Host(`localhost`) && PathPrefix(`/people`)"
+      entryPoints:
+        - web
+      service: api-service-person
+
     backend-api-person:
       rule: "Host(`localhost`) && PathPrefix(`/api_person`)"
       entryPoints:
