@@ -3,6 +3,30 @@ version: '3.9'
 services:
 
   # ==========================================
+  # MESSAGE BROKER SERVICE (NEW)
+  # ==========================================
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: ds-rabbitmq
+    hostname: ds-rabbitmq # Useful for internal connectivity
+    restart: always
+    environment:
+      # Default user/pass for simple setup
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    ports:
+      # 5672: The standard port for AMQP (Advanced Message Queuing Protocol)
+      - "5672:5672"
+      # 15672: The port for the management web UI (accessible via http://localhost:15672)
+      - "15672:15672"
+    networks:
+      proxy-network: # Put it on your existing network so other services can see it
+    volumes:
+      # Optional: Persist RabbitMQ data (queues, messages, etc.)
+      - rabbitmq-data:/var/lib/rabbitmq
+
+  # ==========================================
   # DATABASE SERVICES
   # ==========================================
 
@@ -134,3 +158,4 @@ networks:
 volumes:
   db-device-data:   # Persistent storage for device DB
   db-user-data:     # Persistent storage for user DB
+  rabbitmq-data:
