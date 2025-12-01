@@ -147,6 +147,8 @@ services:
   container-monitoring: # ⬅️ NEW SERVICE
     image: image_monitoring
     container_name: container-monitoring
+#    ports:
+#      - "8083:8083"
     build:
       # ⚠️ UPDATE PATH: Path to your new monitoring-microservice folder
       context: ../../DS/ds2025_spring_example/monitoring-microservice

@@ -37,6 +37,20 @@ http:
         - strip-api-prefix-person
       service: api-service-person
 
+    backend-api-monitoring:
+      rule: "Host(`localhost`) && PathPrefix(`/api_monitoring`)"
+      entryPoints:
+        - web
+      middlewares:
+        - strip-api-prefix-monitoring
+      service: api-service-monitoring
+
+    backend-monitoring-swagger:
+      rule: "Host(`localhost`) && PathPrefix(`/monitoring`)"
+      entryPoints:
+        - web
+      service: api-service-monitoring
+
   middlewares:
     strip-api-prefix-device:
       stripPrefix:
@@ -46,6 +60,10 @@ http:
       stripPrefix:
         prefixes:
           - "/api_person"
+    strip-api-prefix-monitoring:
+      stripPrefix:
+        prefixes:
+          - "/api_monitoring"
 
   services:
     frontend-service:
@@ -62,3 +80,9 @@ http:
       loadBalancer:
         servers:
           - url: "http://container-person:8081"
+
+    api-service-monitoring:
+      loadBalancer:
+        servers:
+          # Must use the container name and the internal port 8083 (from application.properties)
+          - url: "http://container-monitoring:8083"
