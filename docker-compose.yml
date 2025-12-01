@@ -67,6 +67,21 @@ services:
     networks:
       proxy-network:
 
+  db_monitoring: # ⬅️ NEW SERVICE
+    image: postgres
+    container_name: db_monitoring
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: monitoring_db # Dedicated DB name
+    ports:
+      - "5435:5432" # Access from host via localhost:5435
+    volumes:
+      - db-monitoring-data:/var/lib/postgresql
+    networks:
+      proxy-network:
+
 
   # ==========================================
   # BACKEND API SERVICES
@@ -128,6 +143,31 @@ services:
       rabbitmq: # ⬅️ CHANGE 'depends_on' from a list to a map
         condition: service_healthy # ⬅️ ADD THIS CONDITION
 
+
+  container-monitoring: # ⬅️ NEW SERVICE
+    image: image_monitoring
+    container_name: container-monitoring
+    build:
+      # ⚠️ UPDATE PATH: Path to your new monitoring-microservice folder
+      context: ../../DS/ds2025_spring_example/monitoring-microservice
+      dockerfile: Dockerfile
+    environment:
+      # Database connection
+      - DB_IP=db_monitoring
+      - DB_PORT=5432
+      - DB_DBNAME=monitoring_db
+      - DB_USER=postgres
+      - DB_PASSWORD=root
+      # RabbitMQ connection
+      - RABBIT_HOST=ds-rabbitmq
+      # Optional: Traefik configuration if you add a REST endpoint later
+      # - SPRING_PROFILES_ACTIVE=docker
+    networks:
+      proxy-network:
+    depends_on:
+      - db_monitoring
+      - rabbitmq
+
   # ==========================================
   # FRONTEND SERVICE
   # ==========================================
@@ -182,3 +222,4 @@ volumes:
   db-device-data:   # Persistent storage for device DB
   db-user-data:     # Persistent storage for user DB
   rabbitmq-data:
+  db-monitoring-data:

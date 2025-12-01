@@ -776,3 +776,4 @@
 172.18.0.1 - - [30/Nov/2025:22:55:44 +0000] "GET /api_device/device HTTP/1.1" 200 747 "-" "-" 27 "backend-api-device@file" "http://container-device:8080" 7ms
 172.18.0.1 - - [30/Nov/2025:22:56:33 +0000] "GET /api_people/person HTTP/1.1" 404 153 "-" "-" 28 "nginx-frontend@file" "http://frontend:80" 4ms
 172.18.0.1 - - [30/Nov/2025:22:56:45 +0000] "GET /api_person/people HTTP/1.1" 200 525 "-" "-" 29 "backend-api-person@file" "http://container-person:8081" 16ms
+172.18.0.1 - - [01/Dec/2025:10:43:25 +0000] "GET /api_device/device HTTP/1.1" 200 747 "-" "-" 1 "backend-api-device@file" "http://container-device:8080" 258ms
