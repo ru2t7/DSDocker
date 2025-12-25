@@ -170,6 +170,21 @@ services:
       - db_monitoring
       - rabbitmq
 
+  container-communication:
+    image: image_communication
+    container_name: container-communication
+    build:
+      # Update this path to where your new websocket-microservice folder is located
+      context: ../../DS/ds2025_spring_example/websocket-microservice
+      dockerfile: Dockerfile
+    environment:
+      - RABBIT_HOST=ds-rabbitmq
+    networks:
+      - proxy-network
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+
   # ==========================================
   # FRONTEND SERVICE
   # ==========================================

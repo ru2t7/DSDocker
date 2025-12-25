@@ -51,6 +51,13 @@ http:
         - web
       service: api-service-monitoring
 
+    backend-api-communication:
+      # This matches the endpoint we defined in WebSocketConfig: /ws-chat
+      rule: "Host(`localhost`) && PathPrefix(`/ws-chat`)"
+      entryPoints:
+        - web
+      service: api-service-communication
+
   middlewares:
     strip-api-prefix-device:
       stripPrefix:
@@ -86,3 +93,9 @@ http:
         servers:
           # Must use the container name and the internal port 8083 (from application.properties)
           - url: "http://container-monitoring:8083"
+
+    api-service-communication:
+      loadBalancer:
+        servers:
+          # Use the container name and the port 8084 we set in application.properties
+          - url: "http://container-communication:8084"
