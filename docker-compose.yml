@@ -179,6 +179,7 @@ services:
       dockerfile: Dockerfile
     environment:
       - RABBIT_HOST=ds-rabbitmq
+      - GEMINI_API_KEY=AIzaSyDMZcOhC62mALEGZXfB0eDMWhfgTJb2feQ
     networks:
       - proxy-network
     depends_on:
